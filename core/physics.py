@@ -16,13 +16,19 @@ class DetectionPhysics:
         enemy_pos = np.array(enemy['pos'])
         d = np.linalg.norm(point - enemy_pos)
         
-        # 2. 角度判定 
-        # 计算目标点相对于敌人的绝对角度 (度)
-        dx, dy = point[0] - enemy_pos[0], point[1] - enemy_pos[1]
+        # 2. 角度判定
+        # 统一角度约定（数学常用）：0° 向右，90° 向上
+        # 网格坐标是 [row, col]，而屏幕坐标 y 轴向下，故需要对 row 取反映射到 y。
+        dr = point[0] - enemy_pos[0]   # row 差
+        dc = point[1] - enemy_pos[1]   # col 差
+        dx = dc
+        dy = -dr
         target_angle = np.degrees(np.arctan2(dy, dx))
+        target_angle = (target_angle + 360.0) % 360.0
+        enemy_theta = float(enemy['theta']) % 360.0
         
         # 计算角度偏差 angle_diff 
-        angle_diff = np.abs(target_angle - enemy['theta'])
+        angle_diff = np.abs(target_angle - enemy_theta)
         if angle_diff > 180:
             angle_diff = 360 - angle_diff
             
