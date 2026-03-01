@@ -1,4 +1,5 @@
 from collections import deque
+import heapq
 import random
 from typing import Tuple
 
@@ -190,7 +191,86 @@ def build_state_features(env, state: int) -> np.ndarray:
     return feat
 
 
-def risk_aware_action(agent: DQNAgent, env, state: int) -> int:
+def _global_risk_first_action(
+    env,
+    state: int,
+    visit_counts: dict[int, int] | None = None,
+) -> int | None:
+    start_pos_arr = state_to_pos(state, env.grid_width)
+    start = (int(start_pos_arr[0]), int(start_pos_arr[1]))
+    goal = (int(env.goal_pos[0]), int(env.goal_pos[1]))
+
+    if start == goal:
+        return 0
+
+    best_cost: dict[tuple[int, int], tuple[float, int]] = {start: (0.0, 0)}
+    parent: dict[tuple[int, int], tuple[int, int]] = {}
+    pq: list[tuple[float, int, int, int]] = [(0.0, 0, start[0], start[1])]
+
+    while pq:
+        risk_sum, steps, r, c = heapq.heappop(pq)
+        node = (r, c)
+        curr_best = best_cost.get(node)
+        if curr_best is None:
+            continue
+        if (risk_sum, steps) != curr_best:
+            continue
+
+        if node == goal:
+            break
+
+        for _, move in env.actions.items():
+            nr = r + int(move[0])
+            nc = c + int(move[1])
+            next_pos = np.array([nr, nc], dtype=np.int32)
+            if not env._in_bounds(next_pos):
+                continue
+
+            base_risk = float(env.estimate_combined_discovery_probability(next_pos))
+            if base_risk < 1e-6:
+                base_risk = 0.0
+
+            revisit_penalty = 0.0
+            if visit_counts is not None:
+                next_state = int(nr * env.grid_width + nc)
+                v = int(visit_counts.get(next_state, 0))
+                revisit_penalty = min(0.03, 0.003 * max(0, v - 1))
+
+            new_cost = (risk_sum + base_risk + revisit_penalty, steps + 1)
+            next_node = (nr, nc)
+            old = best_cost.get(next_node)
+            if old is None or new_cost < old:
+                best_cost[next_node] = new_cost
+                parent[next_node] = node
+                heapq.heappush(pq, (new_cost[0], new_cost[1], nr, nc))
+
+    if goal not in best_cost:
+        return None
+
+    step = goal
+    while step in parent and parent[step] != start:
+        step = parent[step]
+
+    if step not in parent:
+        return None
+
+    dr = step[0] - start[0]
+    dc = step[1] - start[1]
+    for action, move in env.actions.items():
+        if int(move[0]) == dr and int(move[1]) == dc:
+            return int(action)
+
+    return None
+
+
+def risk_aware_action(
+    agent: DQNAgent,
+    env,
+    state: int,
+    visit_counts: dict[int, int] | None = None,
+    last_state: int | None = None,
+    no_progress_steps: int = 0,
+) -> int:
     state_vec = build_state_features(env, state)
     state_t = torch.tensor(state_vec, dtype=torch.float32, device=agent.device).unsqueeze(0)
 
@@ -219,22 +299,54 @@ def risk_aware_action(agent: DQNAgent, env, state: int) -> int:
         if not np.isfinite(q_val):
             q_val = -1e6
 
+        next_state = int(next_pos[0] * env.grid_width + next_pos[1])
+        visit_penalty = float(visit_counts.get(next_state, 0)) if visit_counts is not None else 0.0
+
         # 词典序目标：
         # 1) 最小 risk_combined
         # 2) 在同风险内最小 dist（更短路径）
-        # 3) 最后用 q_val 打破平局
-        candidates.append((int(action), risk_combined, dist, q_val))
+        # 3) 在同风险同距离下优先更少重复访问（防打转）
+        # 4) 最后用 q_val 打破平局
+        candidates.append((int(action), risk_combined, dist, visit_penalty, q_val, next_state))
 
     if not candidates:
         return 0
 
+    curr_visits = int(visit_counts.get(int(state), 0)) if visit_counts is not None else 0
+    has_zero_risk = any(item[1] <= 1e-9 for item in candidates)
+    hard_stuck = (curr_visits >= 3) or (no_progress_steps >= 8)
+    if hard_stuck or (not has_zero_risk):
+        global_action = _global_risk_first_action(env, state, visit_counts=visit_counts)
+        if global_action is not None:
+            return int(global_action)
+
     min_risk = min(item[1] for item in candidates)
+
+    # 默认严格最小风险；若长时间无进展，适度放宽风险带帮助脱离局部最优
     risk_eps = 1e-9
-    low_risk = [item for item in candidates if item[1] <= min_risk + risk_eps]
+    relax = 0.0
+    if no_progress_steps >= 25:
+        relax = min(0.20, 0.01 * ((no_progress_steps - 25) // 5 + 1))
+    risk_band = min_risk + risk_eps + relax
+
+    low_risk = [item for item in candidates if item[1] <= risk_band]
+
+    # 避免立即来回折返（若存在其它同级候选）
+    if last_state is not None:
+        non_backtrack = [item for item in low_risk if item[5] != last_state]
+        if non_backtrack:
+            low_risk = non_backtrack
+        elif hard_stuck:
+            global_action = _global_risk_first_action(env, state, visit_counts=visit_counts)
+            if global_action is not None:
+                return int(global_action)
 
     min_dist = min(item[2] for item in low_risk)
-    dist_eps = 1e-9
+    dist_eps = 1e-6
     shortest = [item for item in low_risk if item[2] <= min_dist + dist_eps]
 
-    best = max(shortest, key=lambda x: x[3])
+    min_visit = min(item[3] for item in shortest)
+    least_visited = [item for item in shortest if item[3] <= min_visit + 1e-9]
+
+    best = max(least_visited, key=lambda x: x[4])
     return int(best[0])

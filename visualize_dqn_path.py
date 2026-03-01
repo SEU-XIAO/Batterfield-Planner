@@ -48,17 +48,45 @@ def main():
     total_reward = 0.0
     max_path_risk = 0.0
     unchanged_steps = 0
+    visit_counts = {int(state): 1}
+    last_state = None
+    no_progress_steps = 0
 
     print("开始执行 DQN 轨迹，可关闭窗口结束。")
 
     while not done and max_steps > 0:
+        try:
+            if not renderer.root.winfo_exists():
+                print("检测到窗口已关闭，结束可视化。")
+                break
+        except Exception:
+            break
+
         prev_state = state
-        action = risk_aware_action(agent, env, state)
+        curr_pos = np.array([state // env.grid_width, state % env.grid_width], dtype=int)
+        curr_dist = float(np.linalg.norm(curr_pos - env.goal_pos))
+
+        action = risk_aware_action(
+            agent,
+            env,
+            state,
+            visit_counts=visit_counts,
+            last_state=last_state,
+            no_progress_steps=no_progress_steps,
+        )
         state, reward, terminated, truncated, _ = env.step(action)
         done = terminated or truncated
         total_reward += reward
+        last_state = prev_state
+        visit_counts[int(state)] = visit_counts.get(int(state), 0) + 1
 
         pos = np.array([state // env.grid_width, state % env.grid_width], dtype=int)
+        next_dist = float(np.linalg.norm(pos - env.goal_pos))
+        if next_dist < curr_dist - 1e-6:
+            no_progress_steps = 0
+        else:
+            no_progress_steps += 1
+
         curr_risk = env.estimate_combined_discovery_probability(pos)
         if curr_risk > max_path_risk:
             max_path_risk = curr_risk

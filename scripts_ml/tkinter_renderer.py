@@ -95,18 +95,32 @@ class TkinterRenderer:
                 )
 
     def render(self, agent_pos):
-        if self.agent_rect:
-            self.canvas.delete(self.agent_rect)
-        
-        x1 = agent_pos[1] * self.cell_size + self.cell_size * 0.1
-        y1 = agent_pos[0] * self.cell_size + self.cell_size * 0.1
-        x2 = x1 + self.cell_size * 0.8
-        y2 = y1 + self.cell_size * 0.8
-        self.agent_rect = self.canvas.create_rectangle(x1, y1, x2, y2, fill='red')
+        # 窗口可能被用户手动关闭，防止抛出 TclError
+        try:
+            if not self.root.winfo_exists():
+                return
+        except Exception:
+            return
 
-        # Update the display and add a small delay
-        self.root.update()
-        self.root.after(50) # 50ms delay
+        try:
+            if self.agent_rect:
+                self.canvas.delete(self.agent_rect)
+
+            x1 = agent_pos[1] * self.cell_size + self.cell_size * 0.1
+            y1 = agent_pos[0] * self.cell_size + self.cell_size * 0.1
+            x2 = x1 + self.cell_size * 0.8
+            y2 = y1 + self.cell_size * 0.8
+            self.agent_rect = self.canvas.create_rectangle(x1, y1, x2, y2, fill='red')
+
+            # Update the display and add a small delay
+            self.root.update()
+            self.root.after(50) # 50ms delay
+        except tk.TclError:
+            return
 
     def close(self):
-        self.root.destroy()
+        try:
+            if self.root.winfo_exists():
+                self.root.destroy()
+        except Exception:
+            pass

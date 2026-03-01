@@ -1,0 +1,39 @@
+{
+  "map": {
+    "grid_size": 30,
+    "start_pos": [
+      0,
+      0
+    ],
+    "goal_pos": [
+      29,
+      29
+    ]
+  },
+  "enemies": [
+    {
+      "id": 1,
+      "pos": [
+        8,
+        25
+      ],
+      "theta": 216.0,
+      "alpha": 90.0,
+      "comment": "auto-generated enemy 1",
+      "detection_zones": [
+        {
+          "r": 4,
+          "p": 0.95
+        },
+        {
+          "r": 6,
+          "p": 0.6
+        },
+        {
+          "r": 8,
+          "p": 0.3
+        }
+      ]
+    }
+  ]
+}

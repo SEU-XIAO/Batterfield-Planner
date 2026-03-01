@@ -1,0 +1,63 @@
+{
+  "map": {
+    "grid_size": 30,
+    "start_pos": [
+      0,
+      0
+    ],
+    "goal_pos": [
+      29,
+      29
+    ]
+  },
+  "enemies": [
+    {
+      "id": 1,
+      "pos": [
+        6,
+        14
+      ],
+      "theta": 176.0,
+      "alpha": 120.0,
+      "comment": "auto-generated enemy 1",
+      "detection_zones": [
+        {
+          "r": 4,
+          "p": 0.95
+        },
+        {
+          "r": 6,
+          "p": 0.4
+        },
+        {
+          "r": 10,
+          "p": 0.3
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "pos": [
+        15,
+        5
+      ],
+      "theta": 282.0,
+      "alpha": 90.0,
+      "comment": "auto-generated enemy 2",
+      "detection_zones": [
+        {
+          "r": 5,
+          "p": 0.9
+        },
+        {
+          "r": 8,
+          "p": 0.4
+        },
+        {
+          "r": 12,
+          "p": 0.3
+        }
+      ]
+    }
+  ]
+}
