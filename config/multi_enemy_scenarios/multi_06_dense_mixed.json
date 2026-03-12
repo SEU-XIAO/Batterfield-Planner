@@ -1,0 +1,17 @@
+{
+  "map": {
+    "grid_size": 30,
+    "start_pos": [0, 3],
+    "goal_pos": [29, 26]
+  },
+  "enemies": [
+    {"id": 1, "pos": [6, 6], "theta": 20.0, "alpha": 110.0, "comment": "dense A", "detection_zones": [{"r": 4, "p": 0.90}, {"r": 7, "p": 0.62}, {"r": 10, "p": 0.32}]},
+    {"id": 2, "pos": [6, 16], "theta": 130.0, "alpha": 100.0, "comment": "dense B", "detection_zones": [{"r": 4, "p": 0.88}, {"r": 7, "p": 0.60}, {"r": 10, "p": 0.30}]},
+    {"id": 3, "pos": [8, 24], "theta": 220.0, "alpha": 95.0, "comment": "dense C", "detection_zones": [{"r": 3, "p": 0.86}, {"r": 6, "p": 0.58}, {"r": 9, "p": 0.28}]},
+    {"id": 4, "pos": [14, 10], "theta": 350.0, "alpha": 105.0, "comment": "dense D", "detection_zones": [{"r": 4, "p": 0.89}, {"r": 7, "p": 0.61}, {"r": 11, "p": 0.31}]},
+    {"id": 5, "pos": [16, 20], "theta": 160.0, "alpha": 100.0, "comment": "dense E", "detection_zones": [{"r": 4, "p": 0.89}, {"r": 7, "p": 0.61}, {"r": 11, "p": 0.31}]},
+    {"id": 6, "pos": [21, 7], "theta": 40.0, "alpha": 90.0, "comment": "dense F", "detection_zones": [{"r": 3, "p": 0.85}, {"r": 6, "p": 0.57}, {"r": 9, "p": 0.27}]},
+    {"id": 7, "pos": [24, 15], "theta": 270.0, "alpha": 85.0, "comment": "dense G", "detection_zones": [{"r": 3, "p": 0.87}, {"r": 6, "p": 0.59}, {"r": 10, "p": 0.29}]},
+    {"id": 8, "pos": [25, 24], "theta": 210.0, "alpha": 80.0, "comment": "dense H", "detection_zones": [{"r": 3, "p": 0.88}, {"r": 6, "p": 0.60}, {"r": 10, "p": 0.30}]}
+  ]
+}

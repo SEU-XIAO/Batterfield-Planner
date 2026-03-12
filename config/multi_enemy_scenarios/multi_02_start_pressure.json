@@ -1,0 +1,16 @@
+{
+  "map": {
+    "grid_size": 30,
+    "start_pos": [1, 1],
+    "goal_pos": [28, 27]
+  },
+  "enemies": [
+    {"id": 1, "pos": [3, 4], "theta": 230.0, "alpha": 80.0, "comment": "start ring A", "detection_zones": [{"r": 3, "p": 0.86}, {"r": 5, "p": 0.56}, {"r": 8, "p": 0.24}]},
+    {"id": 2, "pos": [5, 2], "theta": 300.0, "alpha": 85.0, "comment": "start ring B", "detection_zones": [{"r": 3, "p": 0.88}, {"r": 6, "p": 0.58}, {"r": 9, "p": 0.28}]},
+    {"id": 3, "pos": [8, 7], "theta": 160.0, "alpha": 75.0, "comment": "early corridor", "detection_zones": [{"r": 4, "p": 0.90}, {"r": 7, "p": 0.60}, {"r": 10, "p": 0.30}]},
+    {"id": 4, "pos": [12, 14], "theta": 330.0, "alpha": 70.0, "comment": "mid pivot", "detection_zones": [{"r": 3, "p": 0.84}, {"r": 6, "p": 0.54}, {"r": 9, "p": 0.24}]},
+    {"id": 5, "pos": [18, 18], "theta": 120.0, "alpha": 85.0, "comment": "mid-right lock", "detection_zones": [{"r": 4, "p": 0.87}, {"r": 7, "p": 0.57}, {"r": 11, "p": 0.27}]},
+    {"id": 6, "pos": [23, 24], "theta": 220.0, "alpha": 80.0, "comment": "goal outer", "detection_zones": [{"r": 4, "p": 0.89}, {"r": 7, "p": 0.59}, {"r": 10, "p": 0.29}]},
+    {"id": 7, "pos": [27, 22], "theta": 20.0, "alpha": 65.0, "comment": "goal gate", "detection_zones": [{"r": 3, "p": 0.86}, {"r": 5, "p": 0.56}, {"r": 8, "p": 0.26}]}
+  ]
+}

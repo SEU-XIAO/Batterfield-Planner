@@ -1,0 +1,15 @@
+{
+  "map": {
+    "grid_size": 30,
+    "start_pos": [0, 0],
+    "goal_pos": [29, 29]
+  },
+  "enemies": [
+    {"id": 1, "pos": [4, 8], "theta": 45.0, "alpha": 70.0, "comment": "upper-left sweep", "detection_zones": [{"r": 3, "p": 0.85}, {"r": 6, "p": 0.55}, {"r": 9, "p": 0.25}]},
+    {"id": 2, "pos": [6, 20], "theta": 210.0, "alpha": 80.0, "comment": "upper-right cover", "detection_zones": [{"r": 4, "p": 0.90}, {"r": 7, "p": 0.60}, {"r": 10, "p": 0.30}]},
+    {"id": 3, "pos": [12, 12], "theta": 320.0, "alpha": 90.0, "comment": "center choke", "detection_zones": [{"r": 3, "p": 0.88}, {"r": 6, "p": 0.58}, {"r": 9, "p": 0.26}]},
+    {"id": 4, "pos": [16, 24], "theta": 170.0, "alpha": 75.0, "comment": "right flank", "detection_zones": [{"r": 4, "p": 0.84}, {"r": 7, "p": 0.54}, {"r": 11, "p": 0.22}]},
+    {"id": 5, "pos": [22, 8], "theta": 20.0, "alpha": 85.0, "comment": "lower-left threat", "detection_zones": [{"r": 3, "p": 0.87}, {"r": 6, "p": 0.57}, {"r": 10, "p": 0.27}]},
+    {"id": 6, "pos": [25, 20], "theta": 250.0, "alpha": 80.0, "comment": "goal-side pressure", "detection_zones": [{"r": 4, "p": 0.89}, {"r": 7, "p": 0.59}, {"r": 10, "p": 0.29}]}
+  ]
+}

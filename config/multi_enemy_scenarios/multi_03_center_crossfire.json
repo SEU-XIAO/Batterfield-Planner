@@ -1,0 +1,17 @@
+{
+  "map": {
+    "grid_size": 32,
+    "start_pos": [0, 2],
+    "goal_pos": [31, 29]
+  },
+  "enemies": [
+    {"id": 1, "pos": [10, 10], "theta": 45.0, "alpha": 90.0, "comment": "center A", "detection_zones": [{"r": 4, "p": 0.90}, {"r": 7, "p": 0.62}, {"r": 10, "p": 0.30}]},
+    {"id": 2, "pos": [10, 21], "theta": 135.0, "alpha": 90.0, "comment": "center B", "detection_zones": [{"r": 4, "p": 0.90}, {"r": 7, "p": 0.62}, {"r": 10, "p": 0.30}]},
+    {"id": 3, "pos": [21, 10], "theta": 315.0, "alpha": 90.0, "comment": "center C", "detection_zones": [{"r": 4, "p": 0.90}, {"r": 7, "p": 0.62}, {"r": 10, "p": 0.30}]},
+    {"id": 4, "pos": [21, 21], "theta": 225.0, "alpha": 90.0, "comment": "center D", "detection_zones": [{"r": 4, "p": 0.90}, {"r": 7, "p": 0.62}, {"r": 10, "p": 0.30}]},
+    {"id": 5, "pos": [15, 6], "theta": 20.0, "alpha": 70.0, "comment": "left choke", "detection_zones": [{"r": 3, "p": 0.85}, {"r": 6, "p": 0.56}, {"r": 9, "p": 0.26}]},
+    {"id": 6, "pos": [15, 25], "theta": 200.0, "alpha": 70.0, "comment": "right choke", "detection_zones": [{"r": 3, "p": 0.85}, {"r": 6, "p": 0.56}, {"r": 9, "p": 0.26}]},
+    {"id": 7, "pos": [6, 15], "theta": 90.0, "alpha": 75.0, "comment": "top choke", "detection_zones": [{"r": 3, "p": 0.87}, {"r": 6, "p": 0.57}, {"r": 10, "p": 0.28}]},
+    {"id": 8, "pos": [25, 15], "theta": 270.0, "alpha": 75.0, "comment": "bottom choke", "detection_zones": [{"r": 3, "p": 0.87}, {"r": 6, "p": 0.57}, {"r": 10, "p": 0.28}]}
+  ]
+}

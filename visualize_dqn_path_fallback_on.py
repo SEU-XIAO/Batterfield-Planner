@@ -13,15 +13,10 @@ DQN_MODEL_PATH = "dqn_model.pth"
 
 
 def main():
-    parser = argparse.ArgumentParser(description="可视化DQN轨迹")
+    parser = argparse.ArgumentParser(description="可视化DQN轨迹（全局兜底器：开启）")
     parser.add_argument("--scenario", default=SCENARIO_PATH, help="场景JSON路径")
     parser.add_argument("--model", default=DQN_MODEL_PATH, help="模型路径")
     parser.add_argument("--delay", type=float, default=0.03, help="每步渲染延迟（秒）")
-    parser.add_argument(
-        "--disable-global-fallback",
-        action="store_true",
-        help="禁用全局兜底器，仅使用局部风险策略",
-    )
     args = parser.parse_args()
 
     with open(args.scenario, "r", encoding="utf-8") as f:
@@ -54,9 +49,6 @@ def main():
         env.close()
         return
 
-    enable_global_fallback = not args.disable_global_fallback
-    mode_text = "开启" if enable_global_fallback else "关闭"
-
     max_steps = 2000
     state, _ = env.reset()
     done = False
@@ -67,7 +59,7 @@ def main():
     last_state = None
     no_progress_steps = 0
 
-    print(f"开始执行 DQN 轨迹，可关闭窗口结束。全局兜底器: {mode_text}")
+    print("开始执行 DQN 轨迹，可关闭窗口结束。全局兜底器: 开启")
 
     while not done and max_steps > 0:
         try:
@@ -88,7 +80,7 @@ def main():
             visit_counts=visit_counts,
             last_state=last_state,
             no_progress_steps=no_progress_steps,
-            enable_global_fallback=enable_global_fallback,
+            enable_global_fallback=True,
         )
         state, reward, terminated, truncated, _ = env.step(action)
         done = terminated or truncated
@@ -125,8 +117,8 @@ def main():
         print(f"DQN轨迹执行结束：未到达目标（达到步数上限），总回报 {total_reward:.2f}")
 
     print(f"轨迹最大联合风险概率: {max_path_risk:.4f}")
-
     print("可视化结束，关闭窗口即可退出。")
+
     try:
         renderer.root.mainloop()
     except Exception:

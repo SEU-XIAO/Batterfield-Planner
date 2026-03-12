@@ -10,13 +10,7 @@ from core.environment import GridEnvironment
 from logic.dqn_agent import DQNAgent, risk_aware_action
 
 
-def evaluate_one_scenario(
-    model_path: str,
-    scenario_path: str,
-    runs: int,
-    max_steps: int,
-    enable_global_fallback: bool,
-) -> Dict[str, float]:
+def evaluate_one_scenario(model_path: str, scenario_path: str, runs: int, max_steps: int) -> Dict[str, float]:
     env = GridEnvironment(scenario_path=scenario_path, render_mode="ansi")
     agent = DQNAgent(state_dim=14, action_dim=env.action_space.n)
     agent.load(model_path)
@@ -30,7 +24,8 @@ def evaluate_one_scenario(
         state, _ = env.reset()
         done = False
         steps = 0
-        risks = []
+        risks: List[float] = []
+
         visit_counts = {int(state): 1}
         last_state = None
         no_progress_steps = 0
@@ -46,7 +41,6 @@ def evaluate_one_scenario(
                 visit_counts=visit_counts,
                 last_state=last_state,
                 no_progress_steps=no_progress_steps,
-                enable_global_fallback=enable_global_fallback,
             )
             prev_state = state
             state, _, terminated, truncated, _ = env.step(action)
@@ -64,8 +58,7 @@ def evaluate_one_scenario(
             done = terminated or truncated
             steps += 1
 
-            pos = np.array([state // env.grid_width, state % env.grid_width], dtype=int)
-            risk = env.estimate_combined_discovery_probability(pos)
+            risk = env.estimate_combined_discovery_probability(next_pos)
             risks.append(float(risk))
 
         if done:
@@ -85,23 +78,22 @@ def evaluate_one_scenario(
     }
 
 
-def main():
-    parser = argparse.ArgumentParser(description="批量评估DQN模型在多场景上的表现")
-    parser.add_argument("--model", default="dqn_model.pth", help="模型路径")
-    parser.add_argument("--scenario-dir", default="config/generated_scenarios", help="场景目录")
-    parser.add_argument("--runs", type=int, default=5, help="每个场景评估次数")
-    parser.add_argument("--max-steps", type=int, default=1200, help="单次轨迹最大步数")
-    parser.add_argument("--out-csv", default="dqn_batch_eval.csv", help="输出CSV路径")
-    parser.add_argument(
-        "--disable-global-fallback",
-        action="store_true",
-        help="禁用全局兜底器，仅使用局部风险策略",
-    )
-    args = parser.parse_args()
+def count_enemies(scenario_path: str) -> int:
+    import json
 
-    enable_global_fallback = not args.disable_global_fallback
-    mode_text = "ON" if enable_global_fallback else "OFF"
-    print(f"Global fallback: {mode_text}")
+    with open(scenario_path, "r", encoding="utf-8") as f:
+        cfg = json.load(f)
+    return len(cfg.get("enemies", []))
+
+
+def main():
+    parser = argparse.ArgumentParser(description="批量测试多敌人场景（默认>=6敌人）")
+    parser.add_argument("--model", default="dqn_model.pth", help="模型路径")
+    parser.add_argument("--scenario-dir", default="config/multi_enemy_scenarios", help="场景目录")
+    parser.add_argument("--runs", type=int, default=3, help="每个场景测试次数")
+    parser.add_argument("--max-steps", type=int, default=1500, help="单次轨迹最大步数")
+    parser.add_argument("--out-csv", default="multi_enemy_eval.csv", help="结果CSV路径")
+    args = parser.parse_args()
 
     scenario_files = sorted(glob.glob(os.path.join(args.scenario_dir, "*.json")))
     if not scenario_files:
@@ -110,23 +102,25 @@ def main():
 
     rows = []
     for path in scenario_files:
+        enemy_count = count_enemies(path)
         metrics = evaluate_one_scenario(
             model_path=args.model,
             scenario_path=path,
             runs=args.runs,
             max_steps=args.max_steps,
-            enable_global_fallback=enable_global_fallback,
         )
         row = {
             "scenario": os.path.basename(path),
+            "enemy_count": enemy_count,
             "success_rate": metrics["success_rate"],
             "avg_steps": metrics["avg_steps"],
             "avg_max_risk": metrics["avg_max_risk"],
             "avg_path_risk": metrics["avg_path_risk"],
         }
         rows.append(row)
+
         print(
-            f"{row['scenario']}: "
+            f"{row['scenario']} (enemies={row['enemy_count']}): "
             f"success={row['success_rate']*100:.1f}% | "
             f"steps={row['avg_steps']:.1f} | "
             f"max_risk={row['avg_max_risk']:.4f} | "
@@ -138,7 +132,7 @@ def main():
     overall_max_risk = float(np.mean([r["avg_max_risk"] for r in rows]))
     overall_path_risk = float(np.mean([r["avg_path_risk"] for r in rows]))
 
-    print("\n=== Overall ===")
+    print("\n=== Overall (Multi-Enemy) ===")
     print(f"mean_success_rate: {overall_success*100:.1f}%")
     print(f"mean_avg_steps: {overall_steps:.1f}")
     print(f"mean_avg_max_risk: {overall_max_risk:.4f}")
@@ -147,7 +141,14 @@ def main():
     with open(args.out_csv, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(
             f,
-            fieldnames=["scenario", "success_rate", "avg_steps", "avg_max_risk", "avg_path_risk"],
+            fieldnames=[
+                "scenario",
+                "enemy_count",
+                "success_rate",
+                "avg_steps",
+                "avg_max_risk",
+                "avg_path_risk",
+            ],
         )
         writer.writeheader()
         for row in rows:

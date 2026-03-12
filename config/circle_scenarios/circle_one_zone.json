@@ -1,0 +1,18 @@
+{
+  "map": {
+    "grid_size": 30,
+    "start_pos": [0, 0],
+    "goal_pos": [29, 29]
+  },
+  "enemies": [
+    {
+      "id": 1,
+      "pos": [14, 14],
+      "danger_shape": "circle",
+      "comment": "单圆危险区示例",
+      "detection_zones": [
+        {"r": 9, "p": 0.45}
+      ]
+    }
+  ]
+}

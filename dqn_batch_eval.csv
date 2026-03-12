@@ -1,5 +1,5 @@
 scenario,success_rate,avg_steps,avg_max_risk,avg_path_risk
-scenario_001.json,1.0,31.0,0.19999999999999996,0.006451612903225805
+scenario_001.json,1.0,301.0,0.19999999999999996,0.0006644518272425247
 scenario_002.json,1.0,29.0,0.0,0.0
 scenario_003.json,1.0,36.0,0.0,0.0
 scenario_004.json,1.0,29.0,0.0,0.0

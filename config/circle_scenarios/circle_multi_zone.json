@@ -7,20 +7,24 @@
   "enemies": [
     {
       "id": 1,
-      "pos": [15, 10],
+      "pos": [10, 10],
       "danger_shape": "circle",
       "comment": "多同心圆危险区示例A",
       "detection_zones": [
-        {"r": 6, "p": 0.60}
+        {"r": 3, "p": 0.90},
+        {"r": 6, "p": 0.60},
+        {"r": 10, "p": 0.30}
       ]
     },
     {
       "id": 2,
-      "pos": [10, 20],
+      "pos": [20, 20],
       "danger_shape": "circle",
       "comment": "多同心圆危险区示例B",
       "detection_zones": [
-        {"r": 8, "p": 0.85}
+        {"r": 4, "p": 0.85},
+        {"r": 7, "p": 0.55},
+        {"r": 11, "p": 0.25}
       ]
     }
   ]

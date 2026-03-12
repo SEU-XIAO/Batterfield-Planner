@@ -1,13 +1,13 @@
 {
   "map": {
-    "grid_size": 30,
+    "grid_size": 300,
     "start_pos": [
       0,
       0
     ],
     "goal_pos": [
-      29,
-      29
+      299,
+      299
     ]
   },
   "enemies": [

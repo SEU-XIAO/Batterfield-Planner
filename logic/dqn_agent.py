@@ -270,6 +270,7 @@ def risk_aware_action(
     visit_counts: dict[int, int] | None = None,
     last_state: int | None = None,
     no_progress_steps: int = 0,
+    enable_global_fallback: bool = True,
 ) -> int:
     state_vec = build_state_features(env, state)
     state_t = torch.tensor(state_vec, dtype=torch.float32, device=agent.device).unsqueeze(0)
@@ -315,7 +316,7 @@ def risk_aware_action(
     curr_visits = int(visit_counts.get(int(state), 0)) if visit_counts is not None else 0
     has_zero_risk = any(item[1] <= 1e-9 for item in candidates)
     hard_stuck = (curr_visits >= 3) or (no_progress_steps >= 8)
-    if hard_stuck or (not has_zero_risk):
+    if enable_global_fallback and (hard_stuck or (not has_zero_risk)):
         global_action = _global_risk_first_action(env, state, visit_counts=visit_counts)
         if global_action is not None:
             return int(global_action)
@@ -336,7 +337,7 @@ def risk_aware_action(
         non_backtrack = [item for item in low_risk if item[5] != last_state]
         if non_backtrack:
             low_risk = non_backtrack
-        elif hard_stuck:
+        elif enable_global_fallback and hard_stuck:
             global_action = _global_risk_first_action(env, state, visit_counts=visit_counts)
             if global_action is not None:
                 return int(global_action)

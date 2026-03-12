@@ -57,7 +57,8 @@ class TkinterRenderer:
 
             theta = enemy.get("theta", 0.0)
             alpha = enemy.get("alpha", 0.0)
-            zones = enemy.get("detection_zones", [])
+            danger_shape = str(enemy.get("danger_shape", "sector")).lower()
+            zones = sorted(enemy.get("detection_zones", []), key=lambda z: float(z["r"]), reverse=True)
 
             for zone in zones:
                 r_cells = zone["r"]  # 以格子为单位的半径
@@ -77,22 +78,32 @@ class TkinterRenderer:
                 x2 = cx + r_pix
                 y2 = cy + r_pix
 
-                # 与 physics 统一：0°向右，90°向上
-                # Tkinter create_arc 也是 0°向右、正角逆时针，因此可直接使用 theta。
-                start_angle = theta - alpha / 2.0
-                extent = alpha
+                if danger_shape == "circle":
+                    self.canvas.create_oval(
+                        x1,
+                        y1,
+                        x2,
+                        y2,
+                        outline="",
+                        fill=color,
+                    )
+                else:
+                    # 与 physics 统一：0°向右，90°向上
+                    # Tkinter create_arc 也是 0°向右、正角逆时针，因此可直接使用 theta。
+                    start_angle = theta - alpha / 2.0
+                    extent = alpha
 
-                self.canvas.create_arc(
-                    x1,
-                    y1,
-                    x2,
-                    y2,
-                    start=start_angle,
-                    extent=extent,
-                    style=tk.PIESLICE,
-                    outline="",
-                    fill=color,
-                )
+                    self.canvas.create_arc(
+                        x1,
+                        y1,
+                        x2,
+                        y2,
+                        start=start_angle,
+                        extent=extent,
+                        style=tk.PIESLICE,
+                        outline="",
+                        fill=color,
+                    )
 
     def render(self, agent_pos):
         # 窗口可能被用户手动关闭，防止抛出 TclError

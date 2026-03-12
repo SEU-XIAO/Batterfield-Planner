@@ -1,0 +1,7 @@
+scenario,enemy_count,success_rate,avg_steps,avg_max_risk,avg_path_risk
+multi_01_boundary_weave.json,6,1.0,71.0,0.0,0.0
+multi_02_start_pressure.json,7,1.0,74.0,0.26,0.03162162162162162
+multi_03_center_crossfire.json,8,1.0,101.0,0.26,0.0025742574257425744
+multi_04_goal_ring.json,6,1.0,93.0,0.832,0.07668817204301075
+multi_05_diagonal_gauntlet.json,7,1.0,137.0,0.0,0.0
+multi_06_dense_mixed.json,8,1.0,69.0,0.31000000000000005,0.01782608695652174

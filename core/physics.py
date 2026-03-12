@@ -14,6 +14,7 @@ class DetectionPhysics:
         2) compute_discovery_probability(x, y, ex, ey, etheta, ealpha, eradius)
         """
         detection_zones = None
+        danger_shape = "sector"
 
         if len(args) == 2:
             point, enemy = args
@@ -25,8 +26,9 @@ class DetectionPhysics:
             else:
                 ex = float(enemy['x'])
                 ey = float(enemy['y'])
-            etheta = float(enemy['theta'])
-            ealpha = float(enemy['alpha'])
+            etheta = float(enemy.get('theta', 0.0))
+            ealpha = float(enemy.get('alpha', 360.0))
+            danger_shape = str(enemy.get('danger_shape', 'sector')).lower()
             detection_zones = enemy.get('detection_zones', [])
             if 'radius' in enemy:
                 eradius = float(enemy['radius'])
@@ -49,20 +51,21 @@ class DetectionPhysics:
         if d > eradius:
             return 0.0
 
-        # 网格坐标(row, col) 转换到数学坐标(x, y)
-        # x 对应 col 差，y 对应 -row 差（因为屏幕 row 向下增大）
-        dx = dc
-        dy = -dr
-        target_angle = float(np.degrees(np.arctan2(dy, dx)))
-        target_angle = (target_angle + 360.0) % 360.0
-        enemy_theta = etheta % 360.0
+        if danger_shape != 'circle':
+            # 网格坐标(row, col) 转换到数学坐标(x, y)
+            # x 对应 col 差，y 对应 -row 差（因为屏幕 row 向下增大）
+            dx = dc
+            dy = -dr
+            target_angle = float(np.degrees(np.arctan2(dy, dx)))
+            target_angle = (target_angle + 360.0) % 360.0
+            enemy_theta = etheta % 360.0
 
-        angle_diff = abs(target_angle - enemy_theta)
-        if angle_diff > 180.0:
-            angle_diff = 360.0 - angle_diff
+            angle_diff = abs(target_angle - enemy_theta)
+            if angle_diff > 180.0:
+                angle_diff = 360.0 - angle_diff
 
-        if angle_diff > (ealpha / 2.0):
-            return 0.0
+            if angle_diff > (ealpha / 2.0):
+                return 0.0
 
         if detection_zones:
             for zone in detection_zones:

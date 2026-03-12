@@ -1,0 +1,15 @@
+{
+  "map": {
+    "grid_size": 30,
+    "start_pos": [2, 1],
+    "goal_pos": [28, 28]
+  },
+  "enemies": [
+    {"id": 1, "pos": [20, 22], "theta": 20.0, "alpha": 80.0, "comment": "goal ring A", "detection_zones": [{"r": 4, "p": 0.88}, {"r": 7, "p": 0.58}, {"r": 11, "p": 0.28}]},
+    {"id": 2, "pos": [22, 26], "theta": 320.0, "alpha": 80.0, "comment": "goal ring B", "detection_zones": [{"r": 4, "p": 0.88}, {"r": 7, "p": 0.58}, {"r": 11, "p": 0.28}]},
+    {"id": 3, "pos": [25, 20], "theta": 60.0, "alpha": 75.0, "comment": "goal ring C", "detection_zones": [{"r": 3, "p": 0.85}, {"r": 6, "p": 0.55}, {"r": 9, "p": 0.25}]},
+    {"id": 4, "pos": [26, 24], "theta": 180.0, "alpha": 70.0, "comment": "goal gate A", "detection_zones": [{"r": 3, "p": 0.90}, {"r": 5, "p": 0.60}, {"r": 8, "p": 0.30}]},
+    {"id": 5, "pos": [24, 27], "theta": 250.0, "alpha": 70.0, "comment": "goal gate B", "detection_zones": [{"r": 3, "p": 0.90}, {"r": 5, "p": 0.60}, {"r": 8, "p": 0.30}]},
+    {"id": 6, "pos": [14, 15], "theta": 40.0, "alpha": 90.0, "comment": "mid blocker", "detection_zones": [{"r": 4, "p": 0.86}, {"r": 7, "p": 0.56}, {"r": 10, "p": 0.26}]}
+  ]
+}
